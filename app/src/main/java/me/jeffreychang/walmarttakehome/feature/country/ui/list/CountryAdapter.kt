@@ -4,10 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import me.jeffreychang.walmarttakehome.databinding.ItemCountryBinding
-import me.jeffreychang.walmarttakehome.model.CountryItem
+import me.jeffreychang.walmarttakehome.model.Country
+import me.jeffreychang.walmarttakehome.model.CountryDtoItem
 
 
-class CountryAdapter : ListAdapter<CountryItem, CountryViewHolder>(CountryItemDiffUtil()) {
+class CountryAdapter : ListAdapter<Country, CountryViewHolder>(CountryItemDiffUtil()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CountryViewHolder {
         val binding = ItemCountryBinding.inflate(
             LayoutInflater.from(parent.context), parent, false

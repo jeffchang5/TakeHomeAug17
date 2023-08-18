@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CountryItem(
+data class CountryDtoItem(
     @SerialName("capital")
     val capital: String,
     @SerialName("code")

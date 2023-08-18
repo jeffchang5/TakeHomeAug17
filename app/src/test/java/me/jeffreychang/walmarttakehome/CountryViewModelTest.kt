@@ -6,10 +6,9 @@ import io.mockk.mockk
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import me.jeffreychang.walmarttakehome.feature.country.ui.CountryViewModel
-import me.jeffreychang.walmarttakehome.model.CountryItem
-import me.jeffreychang.walmarttakehome.model.Currency
-import me.jeffreychang.walmarttakehome.model.Language
+import me.jeffreychang.walmarttakehome.model.Country
 import me.jeffreychang.walmarttakehome.repo.CountryRepository
+import me.jeffreychang.walmarttakehome.util.ResultOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
@@ -31,9 +30,14 @@ class CountryViewModelTest {
     @Test
     fun `getCountries return a success`() = runBlocking {
         val fakeRepo = mockk<CountryRepository> {
-            coEvery { getCountries() } returns listOf(
-                CountryItem(
-                    "Capital", "Code", Currency(",", "", ""), "", "", Language(), "", ""
+            coEvery { getCountries() } returns ResultOf.Success(
+                listOf(
+                    Country(
+                        "name",
+                        "region",
+                        "code",
+                        "capital"
+                    )
                 )
             )
         }
@@ -41,17 +45,18 @@ class CountryViewModelTest {
         vm.getCountries()
 
         val result = vm.uiState().value
-        assert(result is CountryViewModel.CountryUiState.Success &&
-                result.countries.size == 1)
+        assert(
+            result is CountryViewModel.CountryUiState.Success && result.countries.size == 1
+        )
     }
 
 
     @Test
     fun `getCountries with delay return loading`() = runBlocking {
         val fakeRepo = mockk<CountryRepository> {
-            coEvery { getCountries() } coAnswers  {
+            coEvery { getCountries() } coAnswers {
                 delay(500)
-                listOf()
+                ResultOf.Success(listOf())
             }
         }
         vm = CountryViewModel(TestContextProvider, fakeRepo)
@@ -64,7 +69,7 @@ class CountryViewModelTest {
     @Test
     fun `getCountries with throw return error`() = runBlocking {
         val fakeRepo = mockk<CountryRepository> {
-            coEvery { getCountries() } throws IOException("")
+            coEvery { getCountries() } returns ResultOf.Failure("message", IOException())
         }
         vm = CountryViewModel(TestContextProvider, fakeRepo)
         vm.getCountries()

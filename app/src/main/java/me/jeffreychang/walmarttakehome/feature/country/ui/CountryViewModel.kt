@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
-import me.jeffreychang.walmarttakehome.model.CountryItem
+import me.jeffreychang.walmarttakehome.model.Country
+import me.jeffreychang.walmarttakehome.model.CountryDtoItem
 import me.jeffreychang.walmarttakehome.network.CountryNetworkModule
 import me.jeffreychang.walmarttakehome.repo.CountryRepository
 import me.jeffreychang.walmarttakehome.repo.GistCountryRepository
 import me.jeffreychang.walmarttakehome.util.AppContextProvider
 import me.jeffreychang.walmarttakehome.util.ContextProvider
+import me.jeffreychang.walmarttakehome.util.ResultOf
 
 
 class CountryViewModel(
@@ -23,7 +25,7 @@ class CountryViewModel(
     sealed class CountryUiState {
         data object Loading : CountryUiState()
 
-        data class Success(val countries: List<CountryItem>) : CountryUiState()
+        data class Success(val countries: List<Country>) : CountryUiState()
 
         data class Error(val t: Throwable) : CountryUiState()
 
@@ -36,11 +38,14 @@ class CountryViewModel(
     fun getCountries() {
         uiState.postValue(CountryUiState.Loading)
         viewModelScope.launch(contextProvider.io) {
-            try {
-                val countries = countryRepository.getCountries()
-                uiState.postValue(CountryUiState.Success(countries))
-            } catch (t: Throwable) {
-                uiState.postValue(CountryUiState.Error(t))
+            when (val result = countryRepository.getCountries()) {
+                is ResultOf.Success -> {
+                    uiState.postValue(CountryUiState.Success(result.value))
+                }
+
+                is ResultOf.Failure -> {
+                    uiState.postValue(CountryUiState.Error(result.throwable))
+                }
             }
         }
     }

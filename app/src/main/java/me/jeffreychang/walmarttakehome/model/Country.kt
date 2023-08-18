@@ -1,7 +1,3 @@
 package me.jeffreychang.walmarttakehome.model
 
-
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-class Country : ArrayList<CountryItem>()
+data class Country(val name: String, val region: String, val code: String, val capital: String)
